@@ -17,7 +17,7 @@ const steps: HotspotStep[] = [
   {
     id: "categories",
     title: "Categories",
-    description: "Organize your work by business type. Categories group tasks by workflow or function — for example, Legal, Financial, or Operations. They help you and your team see where each task belongs and keep processes consistent across the organization. (Configured by your admin to match how your business actually runs.)",
+    description: "Categories organize tasks by business function — like Legal, Financial, or Operations. Configured by your admin to match your organization's workflows.",
     elementId: "tasks-categories-sidebar",
     position: "right",
     icon: <Tag className="w-5 h-5" />,
@@ -25,7 +25,7 @@ const steps: HotspotStep[] = [
   {
     id: "quick-filters",
     title: "Quick Filters",
-    description: "Your ready-made filter presets. Quick Filters are saved views built from Advanced Filters — shortcuts to help you focus fast. Instead of setting up conditions each time, just click a Quick Filter to see tasks that match key rules like \"My tasks\", \"Pending review\", or \"High priority\". It's your go-to helper for quick visibility and smoother daily work.",
+    description: "Quick Filters are saved filter presets built from Advanced Filters. Access commonly used views instantly — like \"My tasks\", \"Pending review\", or \"High priority\" — without recreating conditions each time. Streamline your workflow and maintain consistent visibility across your team.",
     elementId: "tasks-quick-filters-chips",
     position: "bottom",
     icon: <Filter className="w-5 h-5" />,
@@ -33,7 +33,7 @@ const steps: HotspotStep[] = [
   {
     id: "advanced-filters",
     title: "Advanced Filters",
-    description: "Create custom rules for deeper focus. Advanced Filters let you build precise combinations of conditions — like Owner = Me AND Status = In Progress AND Due ≤ 7 days. They're great for fine-tuning what you see, analyzing work patterns, or setting up new Quick Filter presets for your team.",
+    description: "Build precise filter combinations using conditional logic. Advanced Filters let you combine multiple conditions — like Owner = Me AND Status = In Progress AND Due ≤ 7 days — to create targeted views. Use them to analyze work patterns, set up Quick Filter presets, or customize your view for specific workflows.",
     elementId: "tasks-advanced-filters",
     position: "bottom",
     icon: <Filter className="w-5 h-5" />,
@@ -212,18 +212,6 @@ export function TasksHotspotOnboarding({ onComplete, onSkip }: TasksHotspotOnboa
             </p>
           </div>
         )}
-
-        {/* Індикатор прогресу */}
-        <div className="flex items-center justify-center gap-1.5 mb-6">
-          {steps.map((_, i) => (
-            <div
-              key={i}
-              className={`h-2 rounded-full transition-all ${
-                i === currentStep ? "bg-blue-500 w-8" : "bg-gray-200 w-2"
-              }`}
-            />
-          ))}
-        </div>
 
         {/* Кнопки навігації */}
         <div className={`flex items-center ${isLastStep ? "justify-end" : "justify-between"}`}>

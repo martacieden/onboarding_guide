@@ -213,18 +213,6 @@ export function HomepageStepperTour({ onComplete, onSkip }: HomepageStepperTourP
 
         <p className="text-sm text-gray-600 leading-relaxed mb-6">{step.description}</p>
 
-        {/* Індикатор прогресу */}
-        <div className="flex items-center justify-center gap-1.5 mb-6">
-          {steps.map((_, i) => (
-            <div
-              key={i}
-              className={`h-2 rounded-full transition-all ${
-                i === currentStep ? "bg-blue-500 w-8" : "bg-gray-200 w-2"
-              }`}
-            />
-          ))}
-        </div>
-
         {/* Кнопки навігації */}
         <div className={`flex items-center ${isLastStep ? "justify-end" : "justify-between"}`}>
           {!isLastStep && (

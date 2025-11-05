@@ -227,18 +227,6 @@ export function UserHomePageWalkthrough({ onComplete, onSkip }: UserHomePageWalk
 
         <p className="text-sm text-gray-600 leading-relaxed mb-6">{step.content}</p>
 
-        {/* Індикатор прогресу */}
-        <div className="flex items-center justify-center gap-1.5 mb-6">
-          {walkthroughSteps.map((_, i) => (
-            <div
-              key={i}
-              className={`h-2 rounded-full transition-all ${
-                i === currentStep ? "bg-blue-500 w-8" : "bg-gray-200 w-2"
-              }`}
-            />
-          ))}
-        </div>
-
         {/* Кнопки навігації */}
         <div className="flex items-center justify-between">
           <button

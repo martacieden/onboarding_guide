@@ -1,8 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { X, ArrowRight, Sparkles, Filter, Table2, FolderTree, CheckCircle2 } from "lucide-react"
+import { X, ArrowRight, Sparkles, Filter, CheckCircle2 } from "lucide-react"
 
 interface NextGenWelcomeProps {
   onComplete: () => void
@@ -22,32 +21,20 @@ const slides: Slide[] = [
   {
     title: "Welcome to Way2B1 Next Gen",
     subtitle: "Your upgraded Digital Chief of Staff",
-    description: "We've rebuilt the platform from the ground up with powerful new features to make your work faster, smarter, and more intuitive.",
+    description: "We've rebuilt the platform with powerful new features to make your work faster and smarter.",
     icon: <Sparkles className="w-12 h-12 text-[#94A3B8] stroke-[1.5]" />,
   },
   {
     title: "Meet Fojo: Your AI Assistant",
     subtitle: "Intelligence that amplifies your expertise",
-    description: "Fojo analyzes patterns, surfaces insights, and automates routine tasks. Get proactive suggestions, smart prioritization, and instant answers—all while you maintain full control.",
+    description: "Fojo analyzes patterns, surfaces insights, and automates routine tasks—all while you maintain full control.",
     icon: <Sparkles className="w-12 h-12 text-[#94A3B8] stroke-[1.5]" />,
-    features: [
-      "Automatic task prioritization based on urgency and impact",
-      "Pattern recognition across decisions and workflows",
-      "Proactive insights and recommendations",
-      "Natural language queries for instant information",
-    ],
   },
   {
     title: "Smart Filtering System",
     subtitle: "Find exactly what you need, instantly",
-    description: "New conditional filters and quick filters work together to give you precise control over your view.",
+    description: "Quick and advanced filters work together to give you precise control over your view.",
     icon: <Filter className="w-12 h-12 text-[#94A3B8] stroke-[1.5]" />,
-    features: [
-      "Quick Filters: Combine multiple criteria (works as UNION, showing items matching ANY filter)",
-      "Advanced Filters: Narrow down with precise conditions (works as AND, refining your results)",
-      "Categories: Group decisions by type for better organization",
-      "Save custom filter combinations for recurring needs",
-    ],
   },
 ]
 
@@ -70,7 +57,6 @@ export function NextGenWelcome({ onComplete, onSkip }: NextGenWelcomeProps) {
 
   const currentSlideData = slides[currentSlide]
   const isLastSlide = currentSlide === slides.length - 1
-  const progress = ((currentSlide + 1) / slides.length) * 100
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center animate-in fade-in duration-300">
@@ -104,38 +90,14 @@ export function NextGenWelcome({ onComplete, onSkip }: NextGenWelcomeProps) {
                 {currentSlideData.subtitle}
               </p>
             )}
-            <p className="text-gray-700 leading-relaxed text-pretty mb-4">
-              {currentSlideData.description}
-            </p>
-          </div>
-
-          {currentSlideData.features && (
-            <div className="space-y-2 mt-4">
-              {currentSlideData.features.map((feature, index) => (
-                <div key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
-                  <CheckCircle2 className="w-4 h-4 text-[#4F7CFF] flex-shrink-0 mt-0.5" />
-                  <span>{feature}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Progress bar */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-            <span>
-              Step {currentSlide + 1} of {slides.length}
-            </span>
-            <span>{Math.round(progress)}%</span>
-          </div>
-          <div className="h-2 bg-secondary rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-500 ease-out"
-              style={{ width: `${progress}%` }}
-            />
+            {currentSlideData.description && (
+              <p className="text-gray-700 leading-relaxed text-pretty">
+                {currentSlideData.description}
+              </p>
+            )}
           </div>
         </div>
+
 
         {/* Navigation buttons */}
         <div className="flex gap-3">
