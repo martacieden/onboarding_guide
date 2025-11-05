@@ -17,7 +17,7 @@ const steps: HotspotStep[] = [
   {
     id: "categories",
     title: "Categories",
-    description: "Categories organize tasks by business function — like Legal, Financial, or Operations. Configured by your admin to match your organization's workflows.",
+    description: "Your admin configures these to align with your organization's workflows. If you have questions, contact your admin.",
     elementId: "tasks-categories-sidebar",
     position: "right",
     icon: <Tag className="w-5 h-5" />,
@@ -33,7 +33,7 @@ const steps: HotspotStep[] = [
   {
     id: "advanced-filters",
     title: "Advanced Filters",
-    description: "Build precise filter combinations using conditional logic. Advanced Filters let you combine multiple conditions — like Owner = Me AND Status = In Progress AND Due ≤ 7 days — to create targeted views. Use them to analyze work patterns, set up Quick Filter presets, or customize your view for specific workflows.",
+    description: "Build precise filter combinations using conditional rules (AND logic). Advanced Filters let you combine multiple conditions — like Owner = Me AND Status = In Progress AND Due ≤ 7 days — to create targeted views. Use them to analyze work patterns or customize your view for specific workflows.",
     elementId: "tasks-advanced-filters",
     position: "bottom",
     icon: <Filter className="w-5 h-5" />,

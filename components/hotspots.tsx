@@ -42,7 +42,7 @@ const features: Record<string, Feature> = {
   way2b1Switch: {
     id: "way2b1Switch",
     title: "Go to Way2B1",
-    description: "Switch to the current generation of Way2B1. This option will be removed in the future as we transition fully to Next Gen.",
+    description: "Switch to the current generation of Way2B1.",
     icon: <Settings className="w-5 h-5" />,
   },
   tasksNavigation: {
@@ -74,7 +74,6 @@ const features: Record<string, Feature> = {
 export function Hotspots() {
   const [activeFeature, setActiveFeature] = useState<string | null>(null)
   const [hiddenHotspots, setHiddenHotspots] = useState<Set<string>>(new Set())
-  const [showSearchHint, setShowSearchHint] = useState(true)
   const [userRole, setUserRole] = useState<string | null>(null)
   const pathname = usePathname()
   const router = useRouter()
@@ -220,18 +219,6 @@ export function Hotspots() {
     setActiveFeature(null)
   }
 
-  // Приховуємо підказку пошуку через 5 секунд
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSearchHint(false)
-    }, 5000)
-
-    // Очищаємо таймер при розмонтуванні компонента
-    return () => {
-      clearTimeout(timer)
-    }
-  }, [])
-
   const getHotspotStyle = (hotspot: any) => {
     // Якщо є elementId, використовуємо розраховану позицію
     if (hotspot.elementId && hotspotPositions[hotspot.id]) {
@@ -311,16 +298,6 @@ export function Hotspots() {
           </div>
           <h4 className="font-semibold text-foreground mb-2">{features[activeFeature].title}</h4>
           <p className="text-sm text-muted-foreground leading-relaxed">{features[activeFeature].description}</p>
-        </div>
-      )}
-
-      {/* Search Hint */}
-      {showSearchHint && (
-        <div
-          className="search-hint fixed bg-primary text-primary-foreground px-4 py-2 rounded-lg shadow-lg text-sm font-medium z-[999]"
-          style={{ left: "180px", top: "64px" }}
-        >
-          💡 Press ⌘K to search anytime!
         </div>
       )}
     </>

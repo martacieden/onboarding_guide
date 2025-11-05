@@ -32,7 +32,7 @@ const steps: TourStep[] = [
   {
     id: "way2b1-switch",
     title: "Go to Way2B1",
-    description: "Switch to the current generation of Way2B1. This option will be removed in the future as we transition fully to Next Gen.",
+    description: "Switch to the current generation of Way2B1.",
     elementId: "user-current-gen-switch",
     position: "left",
     icon: <Settings className="w-5 h-5" />,
