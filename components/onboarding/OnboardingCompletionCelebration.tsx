@@ -91,7 +91,7 @@ export function OnboardingCompletionCelebration({ show, onClose }: OnboardingCom
               onClick={onClose}
               className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
             >
-              Get Started
+              Close
             </Button>
           </div>
         </div>
