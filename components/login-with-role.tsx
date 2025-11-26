@@ -43,7 +43,7 @@ export function LoginWithRole({ onLogin }: LoginWithRoleProps) {
   }
 
   // Одразу показуємо форму профілю
-  return (
+    return (
     <div className="fixed inset-0 bg-white z-[10000] flex">
       {/* Left side - Form */}
       <div className="flex-1 flex flex-col p-12 max-w-2xl relative">
@@ -53,7 +53,7 @@ export function LoginWithRole({ onLogin }: LoginWithRoleProps) {
             <span className="text-white font-bold text-xs">W</span>
           </div>
           <span className="text-sm font-bold text-gray-800">WAY2B1</span>
-        </div>
+            </div>
 
         {/* Form content */}
         <div className="flex-1 flex flex-col justify-center">

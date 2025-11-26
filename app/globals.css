@@ -153,6 +153,44 @@
   }
 }
 
+/* Page transitions */
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-transition-enter {
+  animation: pageFadeIn 0.3s ease-out forwards;
+}
+
+/* Smooth transitions for interactive elements */
+.transition-smooth {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Checklist item animation */
+@keyframes checklistComplete {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.checklist-item-complete {
+  animation: checklistComplete 0.3s ease-out;
+}
+
 /* Tutorial Overlay Styles */
 .tutorial-overlay {
   position: fixed;
@@ -372,4 +410,20 @@
 
 .animate-confetti {
   animation: confetti 3s ease-in forwards;
+}
+
+/* Onboarding task highlight */
+.onboarding-task-highlight {
+  background-color: rgba(79, 124, 255, 0.08) !important;
+  border-left: 3px solid #4F7CFF;
+  animation: pulse-highlight 2s ease-in-out infinite;
+}
+
+@keyframes pulse-highlight {
+  0%, 100% {
+    background-color: rgba(79, 124, 255, 0.08);
+  }
+  50% {
+    background-color: rgba(79, 124, 255, 0.15);
+  }
 }

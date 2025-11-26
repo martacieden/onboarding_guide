@@ -12,6 +12,7 @@ import { LearnByDoingFeedback } from "@/components/learn-by-doing-feedback"
 import { DecisionsEmptyState } from "@/components/decisions-empty-state"
 import { CategoryWalkthrough } from "@/components/category-walkthrough"
 import { CategoryAhaMoment } from "@/components/category-aha-moment"
+import { DecisionsTutorial } from "@/components/tutorials/DecisionsTutorial"
 import {
   Plus,
   Search,
@@ -681,6 +682,9 @@ export default function DecisionsPage() {
           isFirstAction={isFirstDecision}
         />
       )}
+
+      {/* Decisions Tutorial */}
+      <DecisionsTutorial />
     </div>
   )
 }

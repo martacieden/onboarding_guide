@@ -1,14 +1,16 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Sidebar } from "@/components/sidebar"
 import { Topbar } from "@/components/topbar"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { TasksEmptyState } from "@/components/tasks-empty-state"
 import { TasksTable } from "@/components/tasks-table"
-import { TasksHotspotOnboarding } from "@/components/tasks-hotspot-onboarding"
 import { AdvancedFiltersModal } from "@/components/advanced-filters-modal"
+import { TasksOnboardingHotspot } from "@/components/tasks-onboarding-hotspot"
+import { ContextualTooltip } from "@/components/contextual-tooltips/ContextualTooltip"
 import {
   Plus,
   Search,
@@ -105,8 +107,8 @@ const mockTasks = [
 ]
 
 export default function TasksPage() {
+  const router = useRouter()
   const [tasks, setTasks] = useState<any[]>([])
-  const [showHotspotOnboarding, setShowHotspotOnboarding] = useState(false)
   const [selectedTasks, setSelectedTasks] = useState<string[]>([])
   const [activeQuickFilter, setActiveQuickFilter] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
@@ -173,30 +175,6 @@ export default function TasksPage() {
   ]
 
   useEffect(() => {
-    // Перевіряємо чи треба показати hotspot onboarding
-    if (typeof window !== "undefined") {
-      const hasSeenTasksOnboarding = localStorage.getItem("way2b1_tasks_onboarding_seen") === "true"
-      const isLoggedIn = localStorage.getItem("way2b1_logged_in") === "true"
-      const hasSeenNextGenWelcome = localStorage.getItem("way2b1_next_gen_welcome_seen") === "true"
-      const shouldStartTour = localStorage.getItem("way2b1_start_tasks_tour") === "true"
-      
-      // Якщо прийшли з Home page через hotspot - запускаємо tour
-      if (shouldStartTour) {
-        localStorage.removeItem("way2b1_start_tasks_tour")
-        setTimeout(() => {
-          setShowHotspotOnboarding(true)
-        }, 500)
-        return
-      }
-      
-      // Показуємо onboarding тільки якщо користувач залогінений, бачив welcome, але не бачив onboarding
-      if (isLoggedIn && hasSeenNextGenWelcome && !hasSeenTasksOnboarding) {
-        setTimeout(() => {
-          setShowHotspotOnboarding(true)
-        }, 500)
-      }
-    }
-
     // Завантажуємо задачі з localStorage або використовуємо mock дані для тестування
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("way2b1_tasks")
@@ -245,10 +223,11 @@ export default function TasksPage() {
     setTasks([...tasks, newTask])
   }
 
+
   const handleTaskClick = (task: any) => {
-    // TODO: Обробка кліку на задачу
-    console.log("Task clicked", task)
+    router.push(`/tasks/${task.id}`)
   }
+
 
   const handleSelectTask = (taskId: string, selected: boolean) => {
     if (selected) {
@@ -270,7 +249,7 @@ export default function TasksPage() {
   const filteredTasks = tasks // Можна додати фільтрацію тут
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="flex h-screen bg-background overflow-hidden page-transition-enter page-transition-enter-active">
       <Sidebar onStartTutorial={() => {}} onOpenTutorialCenter={() => {}} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -427,56 +406,6 @@ export default function TasksPage() {
               </div>
             </div>
 
-            {/* Table Header - показується тільки коли є задачі */}
-            {hasTasks && (
-              <div className="border-b border-border bg-secondary/30 px-6 py-3">
-                <div className="grid grid-cols-12 gap-4 text-xs font-medium text-muted-foreground">
-                  <div className="col-span-1 flex items-center gap-2">
-                    <MoreHorizontal className="w-4 h-4" />
-                  </div>
-                  <div className="col-span-2 flex items-center gap-2">
-                    NAME
-                    <MoreHorizontal className="w-4 h-4" />
-                  </div>
-                  <div className="col-span-1 flex items-center gap-2">
-                    ID
-                    <MoreHorizontal className="w-4 h-4" />
-                  </div>
-                  <div className="col-span-1 flex items-center gap-2">
-                    PRIORITY
-                    <MoreHorizontal className="w-4 h-4" />
-                  </div>
-                  <div className="col-span-1 flex items-center gap-2">
-                    STATUS
-                    <MoreHorizontal className="w-4 h-4" />
-                  </div>
-                  <div className="col-span-1 flex items-center gap-2">
-                    ASSIGNEE
-                    <MoreHorizontal className="w-4 h-4" />
-                  </div>
-                  <div className="col-span-1 flex items-center gap-2">
-                    DUE DATE
-                    <MoreHorizontal className="w-4 h-4" />
-                  </div>
-                  <div className="col-span-1 flex items-center gap-2">
-                    REPORTER
-                    <MoreHorizontal className="w-4 h-4" />
-                  </div>
-                  <div id="tasks-category-column" className="col-span-1 flex items-center gap-2">
-                    CATEGORY
-                    <MoreHorizontal className="w-4 h-4" />
-                  </div>
-                  <div className="col-span-1 flex items-center gap-2">
-                    PROJECT
-                    <MoreHorizontal className="w-4 h-4" />
-                  </div>
-                  <div className="col-span-1 flex items-center gap-2">
-                    AMOUNT
-                    <MoreHorizontal className="w-4 h-4" />
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* Content Area */}
             <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
@@ -507,19 +436,54 @@ export default function TasksPage() {
         </main>
       </div>
 
-      {/* Hotspot Onboarding */}
-      {showHotspotOnboarding && (
-        <TasksHotspotOnboarding
-          onComplete={() => {
-            setShowHotspotOnboarding(false)
-            localStorage.setItem("way2b1_tasks_onboarding_seen", "true")
-          }}
-          onSkip={() => {
-            setShowHotspotOnboarding(false)
-            localStorage.setItem("way2b1_tasks_onboarding_seen", "true")
-          }}
-        />
-      )}
+      {/* Contextual Tooltips */}
+      <ContextualTooltip
+        tooltipKey="tasks-filter"
+        targetElementId="tasks-advanced-filters"
+        message="Use advanced filters to narrow down tasks by multiple criteria (AND logic)"
+        position="bottom"
+        delay={2000}
+      />
+      <ContextualTooltip
+        tooltipKey="tasks-columns"
+        targetElementId="tasks-table-customization"
+        message="Customize your table view by selecting which columns to display and reordering them"
+        position="bottom"
+        delay={2500}
+      />
+      <ContextualTooltip
+        tooltipKey="tasks-new-task"
+        targetElementId="tasks-new-task-button"
+        message="Create a new task to track work items, assign them to team members, and set priorities"
+        position="left"
+        delay={3000}
+      />
+      <ContextualTooltip
+        tooltipKey="tasks-quick-filters"
+        targetElementId="tasks-quick-filters-chips"
+        message="Quick filters work as UNION - they show all tasks matching ANY selected filter"
+        position="bottom"
+        delay={3500}
+      />
+
+
+      {/* Onboarding Task Hotspot */}
+      {tasks.length > 0 && (() => {
+        const onboardingTask = tasks.find(
+          (task: any) => task.name === "Welcome to NextGen — Your Quick Start Guide"
+        )
+        if (onboardingTask) {
+          return (
+            <TasksOnboardingHotspot
+              taskId={onboardingTask.id}
+              onTaskClick={() => {
+                router.push(`/tasks/${onboardingTask.id}`)
+              }}
+            />
+          )
+        }
+        return null
+      })()}
 
     </div>
   )

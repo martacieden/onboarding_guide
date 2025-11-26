@@ -4,6 +4,8 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Plus } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { OnboardingBanner } from "@/components/onboarding/OnboardingBanner"
+import { ContextualTooltip } from "@/components/contextual-tooltips/ContextualTooltip"
 
 export function Dashboard() {
   const [userName, setUserName] = useState("")
@@ -75,6 +77,25 @@ export function Dashboard() {
           <div className="border-b border-gray-200 mt-4"></div>
         </div>
       )}
+
+      {/* Onboarding Banner - placed right after welcome section */}
+      <OnboardingBanner />
+
+      {/* Contextual Tooltips */}
+      <ContextualTooltip
+        tooltipKey="new-task"
+        targetElementId="home-new-task-button"
+        message="Click here to create a new task and start organizing your work"
+        position="bottom"
+        delay={2000}
+      />
+      <ContextualTooltip
+        tooltipKey="new-decision"
+        targetElementId="home-new-decision-button"
+        message="Create a decision to track important choices and approvals"
+        position="bottom"
+        delay={2500}
+      />
 
       {/* Homepage empty state - centered vertically */}
       <div className="flex-1 flex items-center justify-center">

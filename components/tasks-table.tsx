@@ -3,6 +3,12 @@
 import { CheckCircle2, Circle, Info, Play, MoreHorizontal, ChevronDown } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 
+interface ChecklistItem {
+  id: string
+  text: string
+  completed: boolean
+}
+
 interface Task {
   id: string
   taskId?: string // ID like PROJ-7, FAC-14
@@ -23,6 +29,7 @@ interface Task {
   steps?: string[]
   hasSubtasks?: boolean
   isExpanded?: boolean
+  checklistItems?: ChecklistItem[]
 }
 
 interface TasksTableProps {
@@ -131,6 +138,7 @@ export function TasksTable({
             return (
               <tr
                 key={task.id}
+                data-task-id={task.id}
                 className="hover:bg-secondary/30 transition-colors"
               >
                 <td className="px-4 py-3 whitespace-nowrap">
@@ -139,14 +147,25 @@ export function TasksTable({
                     onCheckedChange={(checked) => handleSelectTask(task.id, checked as boolean)}
                   />
                 </td>
-                <td className="px-4 py-3 text-sm text-foreground">
-                  <div className="flex items-center gap-2">
+                <td 
+                  className="px-4 py-3 text-sm text-foreground"
+                >
+                  <div 
+                    className="flex items-center gap-2 cursor-pointer"
+                    onClick={() => onTaskClick && onTaskClick(task)}
+                  >
                     {task.hasSubtasks && (
-                      <button className="p-0.5 hover:bg-secondary rounded">
+                      <button 
+                        className="p-0.5 hover:bg-secondary rounded"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          // Handle subtask toggle if needed
+                        }}
+                      >
                         <ChevronDown className="w-4 h-4 text-muted-foreground" />
                       </button>
                     )}
-                    <span className="truncate max-w-xs">{taskName}</span>
+                    <span className="truncate max-w-xs hover:text-primary transition-colors">{taskName}</span>
                   </div>
                 </td>
                 <td className="px-4 py-3 whitespace-nowrap text-sm text-muted-foreground">

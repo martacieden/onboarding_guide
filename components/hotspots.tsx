@@ -91,16 +91,15 @@ export function Hotspots() {
   // Role-aware hotspots: різні hotspots для різних ролей та флоу
   const getHotspots = () => {
     // Home page hotspots - тільки Tasks navigation hotspot
-    // Stepper tour показується окремо після NextGenWelcome
     if (isHomePage) {
-      const hasSeenStepper = localStorage.getItem("way2b1_homepage_stepper_seen")
-      // Якщо stepper tour пройдено, показуємо тільки Tasks hotspot
-      if (hasSeenStepper) {
+      const hasSeenNextGenWelcome = localStorage.getItem("way2b1_next_gen_welcome_seen")
+      // Показуємо Tasks hotspot після NextGenWelcome
+      if (hasSeenNextGenWelcome) {
         return [
           { id: "tasks-nav", feature: "tasksNavigation", elementId: "sidebar-tasks-link", position: "right" },
         ]
       }
-      // Якщо stepper tour не пройдено, не показуємо hotspots
+      // Якщо NextGenWelcome не пройдено, не показуємо hotspots
       return []
     }
 
