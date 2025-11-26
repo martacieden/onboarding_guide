@@ -51,7 +51,7 @@ export function NextGenWelcome({ onComplete, onSkip }: NextGenWelcomeProps) {
             {/* Meet Fojo */}
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0 w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-[#94A3B8] stroke-[1.5]" />
+                <Sparkles className="w-6 h-6 text-gray-700 stroke-[1.5]" />
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-foreground mb-1">
@@ -69,7 +69,7 @@ export function NextGenWelcome({ onComplete, onSkip }: NextGenWelcomeProps) {
             {/* Smart Filtering */}
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0 w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
-                <Filter className="w-6 h-6 text-[#94A3B8] stroke-[1.5]" />
+                <Filter className="w-6 h-6 text-gray-700 stroke-[1.5]" />
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-foreground mb-1">

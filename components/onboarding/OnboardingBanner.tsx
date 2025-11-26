@@ -3,50 +3,54 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { X, ArrowRight, Sparkles } from "lucide-react"
-import { useFirstTime } from "@/hooks/useFirstTime"
 
 export function OnboardingBanner() {
-  const [isFirstTime, markAsSeen] = useFirstTime("onboarding_banner_dismissed")
   const [isVisible, setIsVisible] = useState(false)
-  const [onboardingCompleted, setOnboardingCompleted] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
     if (typeof window === "undefined") return
 
-    // Check if onboarding task is completed
-    const checkOnboardingCompletion = () => {
+    // Check if onboarding task exists and is completed
+    const checkOnboardingStatus = () => {
       const tasks = JSON.parse(localStorage.getItem("way2b1_tasks") || "[]")
       const onboardingTask = tasks.find(
         (task: any) => task.name === "Welcome to NextGen — Your Quick Start Guide"
       )
 
-      if (onboardingTask?.checklistItems) {
+      if (!onboardingTask) {
+        // No onboarding task - don't show banner
+        setIsVisible(false)
+        return
+      }
+
+      // Check if onboarding is completed
+      if (onboardingTask.checklistItems) {
         const allCompleted = onboardingTask.checklistItems.every(
           (item: any) => item.completed === true
         )
         if (allCompleted) {
           setOnboardingCompleted(true)
-          markAsSeen()
           setIsVisible(false)
+          return
         }
+      }
+
+      // Onboarding task exists and is not completed - show banner
+      // Check if dismissed in this session
+      const dismissedThisSession = sessionStorage.getItem("onboarding_banner_dismissed_session") === "true"
+      if (!dismissedThisSession) {
+        setIsVisible(true)
       }
     }
 
-    // Show banner only if first time and not dismissed
-    if (isFirstTime) {
-      setIsVisible(true)
-    } else {
-      setIsVisible(false)
-    }
-
-    // Check completion status periodically
-    checkOnboardingCompletion()
-    const interval = setInterval(checkOnboardingCompletion, 1000)
+    // Check status immediately and periodically
+    checkOnboardingStatus()
+    const interval = setInterval(checkOnboardingStatus, 1000)
 
     // Listen for task updates
     const handleTaskUpdate = () => {
-      checkOnboardingCompletion()
+      checkOnboardingStatus()
     }
     window.addEventListener("storage", handleTaskUpdate)
     window.addEventListener("taskUpdated", handleTaskUpdate as EventListener)
@@ -56,11 +60,16 @@ export function OnboardingBanner() {
       window.removeEventListener("storage", handleTaskUpdate)
       window.removeEventListener("taskUpdated", handleTaskUpdate as EventListener)
     }
-  }, [isFirstTime, markAsSeen])
+  }, [])
 
   const handleDismiss = () => {
-    markAsSeen()
+    // Don't permanently dismiss - just hide temporarily
+    // Banner will show again if onboarding is not completed
     setIsVisible(false)
+    // Set a temporary flag to hide for this session
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("onboarding_banner_dismissed_session", "true")
+    }
   }
 
   const handleGoToTasks = () => {
