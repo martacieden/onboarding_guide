@@ -122,7 +122,7 @@ export function Dashboard() {
       />
 
       {/* Decisions and Tasks Sections */}
-      <div className="flex-1 px-6 py-6 space-y-6">
+      <div className="flex-1 px-16 py-6 space-y-6">
         {/* Decisions Section */}
         <div>
           <div className="flex items-center justify-between mb-4">
