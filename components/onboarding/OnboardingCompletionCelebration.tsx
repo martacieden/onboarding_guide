@@ -77,12 +77,12 @@ export function OnboardingCompletionCelebration({ show, onClose }: OnboardingCom
               Congratulations! You've completed all the onboarding steps. You're now ready to explore Way2B1 NextGen and make the most of its features.
             </p>
 
-            <div className="p-4 bg-primary/10 border border-primary/20 rounded-xl mb-6">
-              <div className="flex items-center justify-center gap-2 text-primary mb-2">
+            <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl mb-6">
+              <div className="flex items-center justify-center gap-2 text-blue-700 mb-2">
                 <Sparkles className="w-5 h-5" />
                 <div className="text-sm font-semibold">You're all set!</div>
               </div>
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm text-gray-700">
                 Start exploring the platform and discover how Way2B1 can help you manage your work more efficiently.
               </div>
             </div>

@@ -11,9 +11,11 @@ interface TasksOnboardingHotspotProps {
 export function TasksOnboardingHotspot({ taskId, onTaskClick }: TasksOnboardingHotspotProps) {
   const [isFirstTime, markAsSeen] = useFirstTime("tasks_onboarding_hotspot_seen")
   const [position, setPosition] = useState<{ top: number; left: number } | null>(null)
-  const [highlightStyle, setHighlightStyle] = useState<React.CSSProperties>({})
+  const [tooltipPosition, setTooltipPosition] = useState<{ top: number; left: number } | null>(null)
   const [isVisible, setIsVisible] = useState(false)
+  const [showTooltip, setShowTooltip] = useState(false)
   const hotspotRef = useRef<HTMLButtonElement>(null)
+  const tooltipRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!isFirstTime || typeof window === "undefined") {
@@ -45,25 +47,45 @@ export function TasksOnboardingHotspot({ taskId, onTaskClick }: TasksOnboardingH
         
         // Перевіряємо чи рядок видимий
         if (rect.width > 0 && rect.height > 0) {
-          const scrollY = window.scrollY
-          const scrollX = window.scrollX
-          
-          // Позиціонуємо hotspot біля назви задачі (колонка NAME)
-          setPosition({
-            top: rect.top + rect.height / 2,
-            left: rect.left - 25, // Зліва від рядка
-          })
+          // Знаходимо колонку NAME (перша колонка з назвою задачі)
+          const nameCell = taskRow.querySelector('td:first-child') as HTMLElement
+          if (nameCell) {
+            // Знаходимо текстовий елемент всередині комірки (назва задачі)
+            const textElement = nameCell.querySelector('span, a, div, p') || nameCell
+            const textRect = textElement.getBoundingClientRect()
+            
+            // Якщо текстовий елемент має текст, використовуємо Range API для знаходження кінця тексту
+            let textEndX = textRect.right
+            
+            if (textElement.textContent && textElement.textContent.trim()) {
+              try {
+                const range = document.createRange()
+                range.selectNodeContents(textElement)
+                range.collapse(false) // В кінець тексту
+                const rangeRect = range.getBoundingClientRect()
+                textEndX = rangeRect.right
+              } catch (e) {
+                // Fallback до getBoundingClientRect
+                textEndX = textRect.right
+              }
+            }
+            
+            // Позиціонуємо hotspot в кінці тексту з відступом 16px
+            setPosition({
+              top: textRect.top + textRect.height / 2,
+              left: textEndX + 16, // 16px відступ від кінця тексту
+            })
+            
+          } else {
+            // Fallback - якщо не знайдено колонку NAME
+            setPosition({
+              top: rect.top + rect.height / 2,
+              left: rect.left - 25,
+            })
+          }
 
-          // Підсвітка рядка
-          setHighlightStyle({
-            left: `${rect.left + scrollX}px`,
-            top: `${rect.top + scrollY}px`,
-            width: `${rect.width}px`,
-            height: `${rect.height}px`,
-          })
-
-          // Додаємо клас для підсвітки рядка
-          taskRow.classList.add("onboarding-task-highlight")
+          // Підсвітка рядка видалена за запитом користувача
+          // Тултіп показується тільки на ховер (onMouseEnter)
         } else {
           // Рядок знайдено, але ще не видимий
           retryCount++
@@ -89,21 +111,12 @@ export function TasksOnboardingHotspot({ taskId, onTaskClick }: TasksOnboardingH
       clearTimeout(timeout)
       window.removeEventListener("resize", updatePosition)
       window.removeEventListener("scroll", updatePosition)
-      // Видаляємо клас при розмонтуванні
-      const taskRow = document.querySelector(`[data-task-id="${taskId}"]`)
-      if (taskRow) {
-        taskRow.classList.remove("onboarding-task-highlight")
-      }
+      // Cleanup
     }
   }, [isFirstTime, taskId])
 
   const handleClick = () => {
     markAsSeen()
-    // Видаляємо клас підсвітки
-    const taskRow = document.querySelector(`[data-task-id="${taskId}"]`)
-    if (taskRow) {
-      taskRow.classList.remove("onboarding-task-highlight")
-    }
     onTaskClick()
   }
 
@@ -111,26 +124,71 @@ export function TasksOnboardingHotspot({ taskId, onTaskClick }: TasksOnboardingH
 
   return (
     <>
-      {/* Spotlight для підсвітки рядка */}
-      <div
-        className="fixed z-[9998] pointer-events-none rounded-lg border-2 border-blue-500 bg-blue-500/10 transition-all duration-300"
-        style={highlightStyle}
-      />
-      
-      {/* Hotspot кнопка */}
+      {/* Hotspot кнопка - пульсуюча крапочка */}
       <button
         ref={hotspotRef}
         onClick={handleClick}
-        className="fixed z-[9999] pointer-events-auto w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold shadow-lg hover:bg-blue-600 hover:scale-110 transition-all animate-pulse"
+        onMouseEnter={() => {
+          setShowTooltip(true)
+          // Оновлюємо позицію тултіпа при ховері
+          setTimeout(() => {
+            if (hotspotRef.current && tooltipRef.current) {
+              const hotspotRect = hotspotRef.current.getBoundingClientRect()
+              const tooltipRect = tooltipRef.current.getBoundingClientRect()
+              const tooltipWidth = tooltipRect.width || 200
+              const tooltipHeight = tooltipRect.height || 60
+              const viewportWidth = window.innerWidth
+              const margin = 12
+              
+              let tooltipLeft = hotspotRect.right + 12
+              let tooltipTop = hotspotRect.top + hotspotRect.height / 2 - tooltipHeight / 2
+              
+              if (tooltipLeft + tooltipWidth > viewportWidth - margin) {
+                tooltipLeft = hotspotRect.left - tooltipWidth - 12
+              }
+              
+              if (tooltipTop < margin) {
+                tooltipTop = margin
+              } else if (tooltipTop + tooltipHeight > window.innerHeight - margin) {
+                tooltipTop = window.innerHeight - tooltipHeight - margin
+              }
+              
+              setTooltipPosition({
+                top: tooltipTop,
+                left: tooltipLeft,
+              })
+            }
+          }, 50)
+        }}
+        onMouseLeave={() => setShowTooltip(false)}
+        className="fixed z-[9999] pointer-events-auto w-3 h-3 bg-blue-500 rounded-full shadow-lg hover:bg-blue-600 hover:scale-125 transition-all animate-pulse"
         style={{
           top: `${position.top}px`,
           left: `${position.left}px`,
           transform: "translateY(-50%)",
         }}
-        aria-label="Click to open onboarding task"
-      >
-        ?
-      </button>
+        aria-label="Click to start onboarding"
+      />
+      
+      {/* Tooltip - показується тільки на ховер */}
+      {showTooltip && tooltipPosition && (
+        <div
+          ref={tooltipRef}
+          className="fixed z-[10000] pointer-events-none bg-gray-900 text-white text-xs px-3 py-2 rounded-lg shadow-lg animate-in fade-in slide-in-from-left-2 duration-200"
+          style={{
+            top: `${tooltipPosition.top}px`,
+            left: `${tooltipPosition.left}px`,
+            transform: "translateY(-50%)",
+            maxWidth: "200px",
+          }}
+        >
+          <p className="text-white leading-relaxed">
+            Click here to start your onboarding
+          </p>
+          {/* Arrow pointing to hotspot */}
+          <div className="absolute left-[-6px] top-1/2 -translate-y-1/2 w-0 h-0 border-t-4 border-t-transparent border-r-4 border-r-gray-900 border-b-4 border-b-transparent" />
+        </div>
+      )}
     </>
   )
 }

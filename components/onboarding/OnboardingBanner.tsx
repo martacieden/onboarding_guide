@@ -84,7 +84,7 @@ export function OnboardingBanner() {
 
   return (
     <div className="px-6 py-4 animate-in fade-in slide-in-from-top-2 duration-500">
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 relative overflow-hidden transition-smooth hover:shadow-md">
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 relative overflow-hidden">
         {/* Decorative background element */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-100/30 rounded-full -mr-16 -mt-16 blur-2xl"></div>
         

@@ -427,3 +427,24 @@
     background-color: rgba(79, 124, 255, 0.15);
   }
 }
+
+/* Highlight pulse для інтерактивних підказок */
+.highlight-pulse {
+  animation: highlight-pulse 2s ease-in-out;
+  outline: 2px solid #4F7CFF;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@keyframes highlight-pulse {
+  0%, 100% {
+    outline-color: #4F7CFF;
+    outline-width: 2px;
+    background-color: rgba(79, 124, 255, 0.05);
+  }
+  50% {
+    outline-color: #2563eb;
+    outline-width: 3px;
+    background-color: rgba(79, 124, 255, 0.1);
+  }
+}

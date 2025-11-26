@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button"
 import { CheckCircle2, Circle, ArrowLeft, Share2, MoreVertical, Sparkles, X, Send, Search, MessageSquare, Equal, ChevronDown, RefreshCw, List } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { OnboardingCompletionCelebration } from "@/components/onboarding/OnboardingCompletionCelebration"
+import { InteractiveChecklistHint } from "@/components/onboarding/InteractiveChecklistHint"
+import { Toast } from "@/components/ui/toast"
 
 interface ChecklistItem {
   id: string
@@ -43,6 +45,9 @@ export default function TaskDetailPage() {
   const [activeSection, setActiveSection] = useState<string>("summary")
   const [showSummary, setShowSummary] = useState(true)
   const [showCelebration, setShowCelebration] = useState(false)
+  const [commentText, setCommentText] = useState("")
+  const [comments, setComments] = useState<Array<{ id: string; text: string; author: string; timestamp: string }>>([])
+  const [toast, setToast] = useState<{ show: boolean; message: string }>({ show: false, message: "" })
   
   // Calculate progress
   const checklistProgress = localChecklist.length > 0
@@ -72,6 +77,29 @@ export default function TaskDetailPage() {
       router.push("/tasks")
     }
   }, [taskId, router])
+
+  // Плавний скрол до чекліста для onboarding task
+  useEffect(() => {
+    if (!task || typeof window === "undefined") return
+
+    const isOnboardingTask = task.name === "Welcome to NextGen — Your Quick Start Guide"
+    
+    if (isOnboardingTask) {
+      // Чекаємо трохи, щоб сторінка встигла відрендеритися
+      const scrollTimer = setTimeout(() => {
+        const descriptionSection = document.getElementById("description")
+        if (descriptionSection) {
+          setActiveSection("description")
+          descriptionSection.scrollIntoView({ 
+            behavior: "smooth", 
+            block: "start" 
+          })
+        }
+      }, 300)
+
+      return () => clearTimeout(scrollTimer)
+    }
+  }, [task])
 
   const handleChecklistToggle = (itemId: string, completed: boolean) => {
     if (!task) return
@@ -171,8 +199,8 @@ export default function TaskDetailPage() {
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-right mr-4">
-                    <p className="text-sm text-muted-foreground mb-1">Last modified by • {lastModified}</p>
-                    <div className="flex items-center gap-1 justify-end">
+                    <div className="flex items-center gap-2 justify-end">
+                      <p className="text-sm text-muted-foreground">Last modified by • {lastModified}</p>
                       {/* Аватари співробітників - можна додати пізніше */}
                       {task.assignee && (
                         <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-700">
@@ -201,46 +229,46 @@ export default function TaskDetailPage() {
             </div>
 
             {/* Content Area with Anchor Navigation */}
-            <div className="flex-1 overflow-auto">
-              <div className="flex">
-                {/* Left Sidebar - Anchor Navigation */}
-                <div className="w-48 border-r border-border bg-secondary/30 p-4 flex-shrink-0">
-                  <nav className="space-y-1">
-                    <button
-                      onClick={() => scrollToSection("summary")}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        activeSection === "summary"
-                          ? "bg-primary text-primary-foreground"
-                          : "text-muted-foreground hover:bg-secondary"
-                      }`}
-                    >
-                      Summary
-                    </button>
-                    <button
-                      onClick={() => scrollToSection("details")}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        activeSection === "details"
-                          ? "bg-primary text-primary-foreground"
-                          : "text-muted-foreground hover:bg-secondary"
-                      }`}
-                    >
-                      Details
-                    </button>
-                    <button
-                      onClick={() => scrollToSection("description")}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        activeSection === "description"
-                          ? "bg-primary text-primary-foreground"
-                          : "text-muted-foreground hover:bg-secondary"
-                      }`}
-                    >
-                      Description
-                    </button>
-                  </nav>
-                </div>
+            <div className="flex-1 flex overflow-hidden">
+              {/* Left Sidebar - Anchor Navigation */}
+              <div className="w-48 border-r border-border bg-secondary/30 p-4 flex-shrink-0 overflow-y-auto">
+                <nav className="space-y-1">
+                  <button
+                    onClick={() => scrollToSection("summary")}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      activeSection === "summary"
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:bg-secondary"
+                    }`}
+                  >
+                    Summary
+                  </button>
+                  <button
+                    onClick={() => scrollToSection("details")}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      activeSection === "details"
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:bg-secondary"
+                    }`}
+                  >
+                    Details
+                  </button>
+                  <button
+                    onClick={() => scrollToSection("description")}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      activeSection === "description"
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:bg-secondary"
+                    }`}
+                  >
+                    Description
+                  </button>
+                </nav>
+              </div>
 
-                {/* Main Content */}
-                <div className="flex-1 p-6 space-y-8">
+              {/* Main Content */}
+              <div className="flex-1 overflow-y-auto">
+                <div className="p-6 space-y-8">
                   {/* Summary Section */}
                   {showSummary && (
                     <section id="summary" className="scroll-mt-6">
@@ -286,9 +314,52 @@ export default function TaskDetailPage() {
                       <div className="grid grid-cols-subgrid col-span-3">
                         <div className="flex items-start font-medium py-1.5 text-sm">Status</div>
                         <div className="flex items-center min-h-7">
-                          <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-md">
-                            {task.status}
-                          </span>
+                          <select
+                            id="task-status"
+                            value={task.status}
+                            onChange={(e) => {
+                              const newStatus = e.target.value
+                              // Оновлюємо статус в localStorage
+                              const tasks = JSON.parse(localStorage.getItem("way2b1_tasks") || "[]")
+                              const updatedTasks = tasks.map((t: any) => {
+                                if (t.id === task.id) {
+                                  return { ...t, status: newStatus }
+                                }
+                                return t
+                              })
+                              localStorage.setItem("way2b1_tasks", JSON.stringify(updatedTasks))
+                              setTask({ ...task, status: newStatus })
+                              
+                              // Якщо це onboarding task і статус змінився
+                              if (task.name === "Welcome to NextGen — Your Quick Start Guide" && newStatus !== task.status) {
+                                // Відмічаємо checklist-4 (Change status) якщо ще не відмічений
+                                const statusChecklistItem = localChecklist.find(item => item.id === "checklist-4")
+                                if (statusChecklistItem && !statusChecklistItem.completed) {
+                                  handleChecklistToggle("checklist-4", true)
+                                  // Показуємо toast
+                                  setToast({ show: true, message: "Great! You've completed: Change task status" })
+                                }
+                                
+                                // Якщо статус змінено на "Done", автоматично відмічаємо checklist-6
+                                if (newStatus === "Done") {
+                                  const completeChecklistItem = localChecklist.find(item => item.id === "checklist-6")
+                                  if (completeChecklistItem && !completeChecklistItem.completed) {
+                                    handleChecklistToggle("checklist-6", true)
+                                    // Показуємо toast
+                                    setTimeout(() => {
+                                      setToast({ show: true, message: "Great! You've completed: Mark task as complete" })
+                                    }, 500)
+                                  }
+                                }
+                              }
+                            }}
+                            className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-md border-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary"
+                          >
+                            <option value="Created">Created</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Review">Review</option>
+                            <option value="Done">Done</option>
+                          </select>
                         </div>
                       </div>
                       
@@ -380,7 +451,7 @@ export default function TaskDetailPage() {
                             localChecklist.map((item) => (
                               <li 
                                 key={item.id} 
-                                className={`flex items-center m-0 mb-2 transition-smooth ${
+                                className={`flex items-center m-0 mb-2 transition-smooth relative ${
                                   item.completed ? "checklist-item-complete" : ""
                                 }`}
                               >
@@ -392,7 +463,7 @@ export default function TaskDetailPage() {
                                     className="cursor-pointer w-4 h-4 transition-smooth"
                                   />
                                 </label>
-                                <div className="flex-1">
+                                <div className="flex-1 flex items-center">
                                   <p className={`m-0 text-sm transition-smooth ${
                                     item.completed
                                       ? "line-through text-muted-foreground"
@@ -400,6 +471,16 @@ export default function TaskDetailPage() {
                                   }`}>
                                     {item.text}
                                   </p>
+                                  {!item.completed && (
+                                    <InteractiveChecklistHint
+                                      checklistId={item.id}
+                                      isCompleted={item.completed}
+                                      onShow={() => {
+                                        // Додаткова логіка при показі підказки
+                                      }}
+                                      onChecklistToggle={handleChecklistToggle}
+                                    />
+                                  )}
                                 </div>
                               </li>
                             ))
@@ -497,25 +578,89 @@ export default function TaskDetailPage() {
                 </div>
               </div>
 
-              {/* Empty State */}
-              <div className="flex-1 flex items-center justify-center p-6">
-                <div className="text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-secondary flex items-center justify-center">
-                    <MessageSquare className="w-6 h-6 text-muted-foreground" />
+              {/* Comments List */}
+              <div className="flex-1 overflow-auto p-4">
+                {comments.length === 0 ? (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-center">
+                      <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-secondary flex items-center justify-center">
+                        <MessageSquare className="w-6 h-6 text-muted-foreground" />
+                      </div>
+                      <p className="text-sm text-muted-foreground">Start the conversation</p>
+                    </div>
                   </div>
-                  <p className="text-sm text-muted-foreground">Start the conversation</p>
-                </div>
+                ) : (
+                  <div className="space-y-4">
+                    {comments.map((comment) => (
+                      <div key={comment.id} className="flex gap-3">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <span className="text-xs font-medium text-primary">
+                            {comment.author.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)}
+                          </span>
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-sm font-medium text-foreground">{comment.author}</span>
+                            <span className="text-xs text-muted-foreground">{comment.timestamp}</span>
+                          </div>
+                          <p className="text-sm text-foreground whitespace-pre-wrap">{comment.text}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Comment Input */}
               <div className="p-4 border-t border-border">
                 <div className="flex items-end gap-2">
                   <textarea
+                    id="comment-input"
                     placeholder="Add a comment"
+                    value={commentText}
+                    onChange={(e) => setCommentText(e.target.value)}
                     className="flex-1 px-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                     rows={2}
                   />
-                  <Button size="sm" className="gap-2">
+                  <Button 
+                    size="sm" 
+                    className="gap-2"
+                    onClick={() => {
+                      if (commentText.trim()) {
+                        // Створюємо новий коментар
+                        const newComment = {
+                          id: `comment-${Date.now()}`,
+                          text: commentText,
+                          author: task?.assignee || "You",
+                          timestamp: new Date().toLocaleString("en-US", { 
+                            month: "short", 
+                            day: "numeric", 
+                            hour: "numeric", 
+                            minute: "2-digit" 
+                          }),
+                        }
+                        
+                        // Додаємо коментар до списку
+                        setComments([...comments, newComment])
+                        
+                        // Перевіряємо, чи є @ в коментарі
+                        const hasMention = commentText.includes("@")
+                        
+                        // Якщо це onboarding task і є @, автоматично відмічаємо чекбокс
+                        if (task && task.name === "Welcome to NextGen — Your Quick Start Guide" && hasMention) {
+                          const commentChecklistItem = localChecklist.find(item => item.id === "checklist-3")
+                          if (commentChecklistItem && !commentChecklistItem.completed) {
+                            handleChecklistToggle("checklist-3", true)
+                            // Показуємо toast
+                            setToast({ show: true, message: "Great! You've completed: Leave a comment with @mention" })
+                          }
+                        }
+                        
+                        // Очищаємо поле вводу
+                        setCommentText("")
+                      }
+                    }}
+                  >
                     <Send className="w-4 h-4" />
                   </Button>
                 </div>
@@ -528,7 +673,18 @@ export default function TaskDetailPage() {
       {/* Onboarding Completion Celebration */}
       <OnboardingCompletionCelebration
         show={showCelebration}
-        onClose={() => setShowCelebration(false)}
+        onClose={() => {
+          setShowCelebration(false)
+          // Navigate to homepage after closing the celebration
+          router.push("/")
+        }}
+      />
+
+      {/* Toast Notification */}
+      <Toast
+        show={toast.show}
+        message={toast.message}
+        onClose={() => setToast({ show: false, message: "" })}
       />
     </div>
   )
