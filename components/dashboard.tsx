@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Plus } from "lucide-react"
+import { Plus, Workflow, ClipboardList } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { OnboardingBanner } from "@/components/onboarding/OnboardingBanner"
 import { ContextualTooltip } from "@/components/contextual-tooltips/ContextualTooltip"
@@ -10,6 +10,7 @@ import { ContextualTooltip } from "@/components/contextual-tooltips/ContextualTo
 export function Dashboard() {
   const [userName, setUserName] = useState("")
   const [userInitials, setUserInitials] = useState("")
+  const [onboardingTask, setOnboardingTask] = useState<any>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -20,6 +21,29 @@ export function Dashboard() {
       setUserInitials(
         (firstName?.[0] || "") + (lastName?.[0] || "") || "MK"
       )
+      
+      // Load onboarding task
+      const loadOnboardingTask = () => {
+        const tasks = JSON.parse(localStorage.getItem("way2b1_tasks") || "[]")
+        const task = tasks.find(
+          (t: any) => t.name === "Welcome to NextGen — Your Quick Start Guide"
+        )
+        setOnboardingTask(task || null)
+      }
+      
+      loadOnboardingTask()
+      
+      // Listen for task updates
+      const handleTaskUpdate = () => {
+        loadOnboardingTask()
+      }
+      window.addEventListener("taskUpdated", handleTaskUpdate)
+      window.addEventListener("storage", handleTaskUpdate)
+      
+      return () => {
+        window.removeEventListener("taskUpdated", handleTaskUpdate)
+        window.removeEventListener("storage", handleTaskUpdate)
+      }
     }
   }, [])
 
@@ -97,26 +121,82 @@ export function Dashboard() {
         delay={2500}
       />
 
-      {/* Homepage empty state - centered vertically */}
-      <div className="flex-1 flex items-center justify-center">
-        <div id="home-empty-state" className="flex items-center justify-between gap-16 px-8 w-full max-w-7xl mx-auto">
-          <div className="flex-1 max-w-2xl">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Ah, a fresh homepage
-            </h2>
-            <p className="text-gray-600 leading-relaxed">
-              You don't have any assigned decisions or tasks yet, but when you do, you'll find them here.
-            </p>
+      {/* Decisions and Tasks Sections */}
+      <div className="flex-1 px-6 py-6 space-y-6">
+        {/* Decisions Section */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">Decisions</h2>
+            <button
+              onClick={handleCreateDecision}
+              className="flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              New Decision
+            </button>
           </div>
-          
-          {/* Illustration */}
-          <div className="flex-shrink-0">
-            <img 
-              src="/illustration-homepage.svg" 
-              alt="Homepage illustration" 
-              className="w-full max-w-md"
-            />
+          <div className="bg-white rounded-lg border border-gray-200 p-12">
+            <div className="text-center max-w-md mx-auto">
+              <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <Workflow className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Add your first decision</h3>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                Create requests needing approval and record keeping
+              </p>
+            </div>
           </div>
+        </div>
+
+        {/* Tasks Section */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">Tasks</h2>
+            <button
+              id="home-new-task-button"
+              onClick={handleCreateTask}
+              className="flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              New Task
+            </button>
+          </div>
+          {onboardingTask ? (
+            <div className="bg-white rounded-lg border border-gray-200">
+              <div
+                onClick={() => router.push(`/tasks/${onboardingTask.id}`)}
+                className="p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-5 h-5 border-2 border-gray-300 rounded flex-shrink-0"></div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-medium text-gray-900 truncate">
+                      {onboardingTask.title || onboardingTask.name}
+                    </h3>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {onboardingTask.taskId || onboardingTask.id}
+                    </p>
+                  </div>
+                  <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full">
+                    {onboardingTask.status || "Created"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white rounded-lg border border-gray-200 p-12">
+              <div className="text-center max-w-md mx-auto">
+                <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-6">
+                  <ClipboardList className="w-10 h-10 text-gray-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">No records to show</h3>
+                <p className="text-sm text-gray-600 mb-8 leading-relaxed">
+                  Add new records or import data to get started. Try adjusting your filters or search settings if
+                  you're expecting to see something specific.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
