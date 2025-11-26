@@ -33,6 +33,8 @@ The onboarding starts with a profile details form where users enter:
 
 **Screenshot**: See `screenshots/profile-form.png` (to be added)
 
+**Detailed Description**: See `screenshots/README.md` for comprehensive visual description of the profile form layout, including left panel (form) and right panel (illustration) details.
+
 ### 2. Welcome Popup
 
 After profile submission, users see a welcome popup introducing them to Way2B1 NextGen.
