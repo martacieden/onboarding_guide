@@ -162,25 +162,59 @@ export function Dashboard() {
             </button>
           </div>
           {onboardingTask ? (
-            <div className="bg-white rounded-lg border border-gray-200">
-              <div
-                onClick={() => router.push(`/tasks/${onboardingTask.id}`)}
-                className="p-4 hover:bg-gray-50 transition-colors cursor-pointer"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 border-2 border-gray-300 rounded flex-shrink-0"></div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-medium text-gray-900 truncate">
-                      {onboardingTask.title || onboardingTask.name}
-                    </h3>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {onboardingTask.taskId || onboardingTask.id}
-                    </p>
-                  </div>
-                  <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full">
-                    {onboardingTask.status || "Created"}
-                  </span>
-                </div>
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Organization
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Name
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Priority
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Due Date
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    <tr
+                      onClick={() => router.push(`/tasks/${onboardingTask.id}`)}
+                      className="hover:bg-gray-50 transition-colors cursor-pointer"
+                    >
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          onboardingTask.status === "In Progress" 
+                            ? "bg-blue-100 text-blue-700" 
+                            : onboardingTask.status === "Created"
+                            ? "bg-gray-100 text-gray-700"
+                            : "bg-blue-100 text-blue-700"
+                        }`}>
+                          {onboardingTask.status || "Created"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                        {onboardingTask.organization || "—"}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-900">
+                        {onboardingTask.title || onboardingTask.name}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
+                        = {onboardingTask.priority || "Normal"}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
+                        {onboardingTask.dueDate && onboardingTask.dueDate !== "—" ? onboardingTask.dueDate : "—"}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           ) : (
