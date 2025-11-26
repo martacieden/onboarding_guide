@@ -45,44 +45,52 @@ export function TasksOnboardingHotspot({ taskId, onTaskClick }: TasksOnboardingH
       if (taskRow) {
         const rect = taskRow.getBoundingClientRect()
         
-        // Перевіряємо чи рядок видимий
-        if (rect.width > 0 && rect.height > 0) {
-          // Знаходимо колонку NAME (перша колонка з назвою задачі)
-          const nameCell = taskRow.querySelector('td:first-child') as HTMLElement
-          if (nameCell) {
-            // Знаходимо текстовий елемент всередині комірки (назва задачі)
-            const textElement = nameCell.querySelector('span, a, div, p') || nameCell
-            const textRect = textElement.getBoundingClientRect()
-            
-            // Якщо текстовий елемент має текст, використовуємо Range API для знаходження кінця тексту
-            let textEndX = textRect.right
-            
-            if (textElement.textContent && textElement.textContent.trim()) {
-              try {
-                const range = document.createRange()
-                range.selectNodeContents(textElement)
-                range.collapse(false) // В кінець тексту
-                const rangeRect = range.getBoundingClientRect()
-                textEndX = rangeRect.right
-              } catch (e) {
-                // Fallback до getBoundingClientRect
-                textEndX = textRect.right
+          // Перевіряємо чи рядок видимий
+          if (rect.width > 0 && rect.height > 0) {
+            // Знаходимо колонку NAME (друга колонка, бо перша - це checkbox)
+            const nameCell = taskRow.querySelector('td:nth-child(2)') as HTMLElement
+            if (nameCell) {
+              // Знаходимо span з назвою задачі всередині комірки
+              const textElement = nameCell.querySelector('span') as HTMLElement
+              if (textElement) {
+                const textRect = textElement.getBoundingClientRect()
+                
+                // Якщо текстовий елемент має текст, використовуємо Range API для знаходження кінця тексту
+                let textEndX = textRect.right
+                
+                if (textElement.textContent && textElement.textContent.trim()) {
+                  try {
+                    const range = document.createRange()
+                    range.selectNodeContents(textElement)
+                    range.collapse(false) // В кінець тексту
+                    const rangeRect = range.getBoundingClientRect()
+                    textEndX = rangeRect.right
+                  } catch (e) {
+                    // Fallback до getBoundingClientRect
+                    textEndX = textRect.right
+                  }
+                }
+                
+                // Позиціонуємо hotspot в кінці тексту з відступом 16px
+                setPosition({
+                  top: textRect.top + textRect.height / 2,
+                  left: textEndX + 16, // 16px відступ від кінця тексту
+                })
+              } else {
+                // Fallback - якщо не знайдено span, використовуємо комірку
+                const cellRect = nameCell.getBoundingClientRect()
+                setPosition({
+                  top: cellRect.top + cellRect.height / 2,
+                  left: cellRect.right + 16,
+                })
               }
+            } else {
+              // Fallback - якщо не знайдено колонку NAME
+              setPosition({
+                top: rect.top + rect.height / 2,
+                left: rect.left + 200, // Приблизна позиція для назви задачі
+              })
             }
-            
-            // Позиціонуємо hotspot в кінці тексту з відступом 16px
-            setPosition({
-              top: textRect.top + textRect.height / 2,
-              left: textEndX + 16, // 16px відступ від кінця тексту
-            })
-            
-          } else {
-            // Fallback - якщо не знайдено колонку NAME
-            setPosition({
-              top: rect.top + rect.height / 2,
-              left: rect.left - 25,
-            })
-          }
 
           // Підсвітка рядка видалена за запитом користувача
           // Тултіп показується тільки на ховер (onMouseEnter)
