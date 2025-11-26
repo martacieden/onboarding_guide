@@ -471,7 +471,7 @@ export default function TaskDetailPage() {
                                   }`}>
                                     {item.text}
                                   </p>
-                                  {!item.completed && (
+                                  {!item.completed && item.id === "checklist-1" && (
                                     <InteractiveChecklistHint
                                       checklistId={item.id}
                                       isCompleted={item.completed}
