@@ -30,7 +30,6 @@ export function OnboardingBanner() {
           (item: any) => item.completed === true
         )
         if (allCompleted) {
-          setOnboardingCompleted(true)
           setIsVisible(false)
           return
         }
